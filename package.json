@@ -1,15 +1,14 @@
 {
-  "name": "api-cap-iphone",
+  "name": "api-cap-pro",
   "version": "1.0.0",
-  "description": "API chụp ảnh web random iPhone 15-17",
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "start": "node index.js",
-    "dev": "node index.js"
+    "start": "node index.js"
   },
   "dependencies": {
     "express": "^4.19.2",
-    "puppeteer": "^22.0.0"
+    "puppeteer-core": "^22.15.0",
+    "chromium": "^3.0.3"
   }
 }
