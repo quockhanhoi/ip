@@ -1,5 +1,5 @@
 {
-  "name": "api-cap-pro",
+  "name": "api-cap-pro-max",
   "version": "1.0.0",
   "main": "index.js",
   "type": "module",
@@ -9,6 +9,9 @@
   "dependencies": {
     "express": "^4.19.2",
     "puppeteer-core": "^22.15.0",
-    "@sparticuz/chromium": "^123.0.0"
+    "@sparticuz/chromium": "^123.0.0",
+    "puppeteer-extra": "^3.3.6",
+    "puppeteer-extra-plugin-stealth": "^2.11.2",
+    "axios": "^1.6.0"
   }
 }
