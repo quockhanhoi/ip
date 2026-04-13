@@ -1,32 +1,32 @@
 import express from "express";
 import puppeteer from "puppeteer-core";
-import chromium from "chromium";
+import chromium from "@sparticuz/chromium";
 
 const app = express();
 
-// 🎲 fake iPhone 15–17
+// 🎲 random iPhone 15–17
 const devices = [
   {
     name: "iPhone 15 Pro",
     width: 393,
     height: 852,
-    ua: "Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Mobile/15E148 Safari/604.1"
+    ua: "Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X)"
   },
   {
     name: "iPhone 16 Pro",
     width: 402,
     height: 874,
-    ua: "Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.0 Mobile/15E148 Safari/604.1"
+    ua: "Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X)"
   },
   {
     name: "iPhone 17 Pro",
     width: 430,
     height: 932,
-    ua: "Mozilla/5.0 (iPhone; CPU iPhone OS 19_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/19.0 Mobile/15E148 Safari/604.1"
+    ua: "Mozilla/5.0 (iPhone; CPU iPhone OS 19_0 like Mac OS X)"
   }
 ];
 
-// 🌐 API cap
+// 🚀 API CAP
 app.get("/cap", async (req, res) => {
   try {
     const url = req.query.url;
@@ -38,18 +38,14 @@ app.get("/cap", async (req, res) => {
     const device = devices[Math.floor(Math.random() * devices.length)];
 
     const browser = await puppeteer.launch({
-      executablePath: await chromium.executablePath,
-      args: [
-        ...chromium.args,
-        "--no-sandbox",
-        "--disable-setuid-sandbox"
-      ],
-      headless: true
+      args: chromium.args,
+      executablePath: await chromium.executablePath(),
+      headless: chromium.headless
     });
 
     const page = await browser.newPage();
 
-    // 📱 fake mobile
+    // 📱 fake iPhone
     await page.setUserAgent(device.ua);
     await page.setViewport({
       width: device.width,
@@ -59,7 +55,6 @@ app.get("/cap", async (req, res) => {
       deviceScaleFactor: 3
     });
 
-    // 🌍 mở web
     await page.goto(url, {
       waitUntil: "networkidle2",
       timeout: 60000
@@ -67,7 +62,6 @@ app.get("/cap", async (req, res) => {
 
     await page.waitForTimeout(delay);
 
-    // 📸 chụp
     const img = await page.screenshot({
       fullPage: full
     });
@@ -79,13 +73,19 @@ app.get("/cap", async (req, res) => {
 
   } catch (err) {
     console.error(err);
-    res.status(500).send("Lỗi cap");
+    res.status(500).send("Lỗi cap: " + err.message);
   }
 });
 
-// 🔥 dùng PORT của Render
-const PORT = process.env.PORT || 3000;
-
-app.listen(PORT, () => {
-  console.log("API chạy port " + PORT);
+// 🏠 trang chủ
+app.get("/", (req, res) => {
+  res.send(`
+    <h2>API CAP WEB 🚀</h2>
+    <p>Dùng:</p>
+    <code>/cap?url=https://google.com&delay=3000&full=true</code>
+  `);
 });
+
+// 🔥 Render PORT
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => console.log("Running port " + PORT));
