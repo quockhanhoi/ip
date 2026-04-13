@@ -14,23 +14,27 @@ const devices = [
   { width: 430, height: 932, ua: "Mozilla/5.0 (iPhone; CPU iPhone OS 19_0 like Mac OS X)" }
 ];
 
-// 🚀 mở browser 1 lần
+// 🚀 mở browser 1 lần (fix ETXTBSY)
 async function getBrowser() {
   if (!browser) {
     browser = await puppeteer.launch({
+      executablePath: await chromium.executablePath(),
       args: [
         ...chromium.args,
         "--no-sandbox",
         "--disable-setuid-sandbox",
+        "--disable-dev-shm-usage",
         "--single-process",
         "--no-zygote"
       ],
-      executablePath: await chromium.executablePath(),
-      headless: chromium.headless
+      headless: true
     });
   }
   return browser;
 }
+
+// 🔥 preload tránh 502
+getBrowser();
 
 // 📸 API
 app.get("/cap", async (req, res) => {
@@ -55,17 +59,17 @@ app.get("/cap", async (req, res) => {
       deviceScaleFactor: 3
     });
 
-    // ⚡ load nhanh kiểu API
+    // ⚡ load nhanh, không treo
     await page.goto(url, {
       waitUntil: "domcontentloaded",
-      timeout: 20000
+      timeout: 15000
     }).catch(() => {});
 
-    await new Promise(r => setTimeout(r, 2000));
+    // delay nhẹ
+    await new Promise(r => setTimeout(r, 1500));
 
     const img = await page.screenshot({
-      fullPage: full,
-      type: "png"
+      fullPage: full
     });
 
     await page.close();
@@ -75,14 +79,18 @@ app.get("/cap", async (req, res) => {
 
   } catch (err) {
     console.error(err);
-    res.status(500).send("Lỗi cap");
+    res.status(200).send("cap lỗi nhưng server vẫn sống");
   }
 });
 
 // 🏠 home
 app.get("/", (req, res) => {
-  res.send("API CAP IPHONE 🚀");
+  res.send(`
+    <h2>API CAP FINAL 🚀</h2>
+    <p>/cap?url=https://example.com&full=true</p>
+  `);
 });
 
+// 🔥 PORT chuẩn Render
 const PORT = process.env.PORT || 3000;
-app.listen(PORT);
+app.listen(PORT, () => console.log("Running port " + PORT));
